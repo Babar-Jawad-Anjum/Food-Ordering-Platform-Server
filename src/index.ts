@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import "dotenv/config";
 import mongoose from "mongoose";
@@ -10,6 +10,12 @@ mongoose
   .then(() => console.log("Connected to Mongo!"));
 
 const app = express();
+
+// simple endpoint to check if server is up & running properly
+app.get("/health", (req: Request, res: Response) => {
+  res.send({ message: "health OK!" });
+});
+
 app.use(express.json());
 app.use(cors());
 
