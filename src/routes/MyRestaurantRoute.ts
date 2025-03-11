@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import MyRestaurantController from "../controllers/MyRestaurantController";
 import { jwtCheck, jwtParse } from "../middlewares/auth";
+import { validateMyRestaurantRequest } from "../middlewares/validation";
 
 const router = express.Router();
 
@@ -15,9 +16,10 @@ const upload = multer({
 
 router.post(
   "/",
+  upload.single("imageFile"), // will embed file in req object which can be accessed by req.file
+  validateMyRestaurantRequest,
   jwtCheck,
   jwtParse,
-  upload.single("imageFile"), // will embed file in req object which can be accessed by req.file
   MyRestaurantController.createMyRestaurant
 );
 
