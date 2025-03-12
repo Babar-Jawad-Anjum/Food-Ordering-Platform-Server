@@ -14,6 +14,7 @@ const upload = multer({
   },
 });
 
+router.get("/", jwtCheck, jwtParse, MyRestaurantController.getMyRestaurant);
 router.post(
   "/",
   upload.single("imageFile"), // will embed file in req object which can be accessed by req.file

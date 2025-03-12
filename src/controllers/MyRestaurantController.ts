@@ -3,6 +3,20 @@ import { Request, Response } from "express";
 import Restaurant from "../models/restaurant";
 import mongoose from "mongoose";
 
+const getMyRestaurant = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const restaurant = await Restaurant.findOne({ user: req.userId });
+
+    if (!restaurant)
+      return res.status(404).json({ message: "Restaurant not found!" });
+
+    res.status(200).json(restaurant);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error fetching restaurant!" });
+  }
+};
+
 const createMyRestaurant = async (
   req: Request,
   res: Response
@@ -43,4 +57,5 @@ const createMyRestaurant = async (
 
 export default {
   createMyRestaurant,
+  getMyRestaurant,
 };
