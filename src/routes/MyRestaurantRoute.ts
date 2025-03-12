@@ -23,5 +23,13 @@ router.post(
   jwtParse,
   MyRestaurantController.createMyRestaurant
 );
+router.put(
+  "/",
+  upload.single("imageFile"), // will embed file in req object which can be accessed by req.file
+  validateMyRestaurantRequest,
+  jwtCheck,
+  jwtParse,
+  MyRestaurantController.updateMyRestaurant
+);
 
 export default router;
