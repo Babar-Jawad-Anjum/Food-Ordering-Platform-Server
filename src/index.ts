@@ -23,13 +23,17 @@ cloudinary.config({
 
 const app = express();
 
+app.use(cors());
+
+// Ding this for validation and security reasons
+app.use("/api/order/checkout/webhook", express.raw({ type: "*/*" }));
+
+app.use(express.json());
+
 // simple endpoint to check if server is up & running properly
 app.get("/health", (req: Request, res: Response) => {
   res.send({ message: "health OK!" });
 });
-
-app.use(express.json());
-app.use(cors());
 
 app.use("/api/my/user", myUserRoute);
 app.use("/api/my/restaurant", myRestaurantRoute);
