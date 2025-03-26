@@ -2,6 +2,7 @@ import cloudinary from "cloudinary";
 import { Request, Response } from "express";
 import Restaurant from "../models/restaurant";
 import mongoose from "mongoose";
+import Order from "../models/Order";
 
 const getMyRestaurant = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -48,6 +49,27 @@ const createMyRestaurant = async (
   }
 };
 
+const getMyRestaurantOrders = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const restaurant = await Restaurant.findOne({ user: req.userId });
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    const orders = await Order.find({ restaurant: restaurant._id })
+      .populate("restaurant")
+      .populate("user");
+
+    res.json(orders);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "something went wrong" });
+  }
+};
+
 const updateMyRestaurant = async (
   req: Request,
   res: Response
@@ -85,6 +107,33 @@ const updateMyRestaurant = async (
   }
 };
 
+const updateOrderStatus = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const restaurant = await Restaurant.findById(order.restaurant);
+
+    // The order of restaurant belongs to user's restaurant or not who logged in
+    if (restaurant?.user?._id.toString() !== req.userId) {
+      return res.status(401).send();
+    }
+
+    order.status = status;
+    await order.save();
+
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Unable to update order status" });
+  }
+};
+
 const uploadImage = async (file: Express.Multer.File) => {
   //* Image conversion from raw binary to base 64 encoded
   const image = file;
@@ -100,4 +149,6 @@ export default {
   createMyRestaurant,
   getMyRestaurant,
   updateMyRestaurant,
+  getMyRestaurantOrders,
+  updateOrderStatus,
 };
